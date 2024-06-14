@@ -1,0 +1,517 @@
+{% extends 'base.html' %}
+{% block title %}
+    View
+{% endblock %}
+
+{% block content %}
+
+<style>
+                 .expandable-content {
+                    max-height: 50px;
+                    overflow: hidden;
+                    position: relative;
+                    transition: max-height 0.3s ease;
+                }
+
+                .expandable-content:target {
+                    max-height: none;
+                }
+
+                .expand-link {
+                    display: block;
+                }
+
+                 
+                .container {
+            padding-top: 20px;
+        }
+        .table {
+            box-shadow: 0 4px 21px rgb(74 80 91 / 88%) ; /* Leggera ombreggiatura */
+            border-collapse: separate;
+            border-spacing: 0 10px; /* Spaziatura tra le righe */
+            border-radius: 7px;
+        }
+        .table tbody tr {
+            background-color: #454d55; /* Colore di sfondo per le righe della tabella */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombreggiatura per le righe della tabella */
+            
+        }
+        .table thead th {
+            background-color: #343a40; /* Colore di sfondo per le intestazioni */
+        }
+        .table-hover tbody tr:hover {
+            background-color: #555b61; /* Colore di sfondo per le righe al passaggio del mouse */
+        }
+
+               
+
+        .close-link {
+            display: none; 
+        }
+
+        .expandable-content:target + .expand-link {
+            display: none;
+        }
+
+        .expandable-content:target ~ .close-link {
+            display: inline-block; 
+        }
+
+        /* Customize pagination colors */
+        .pagination .page-link {
+            color: #333; /* Text color */
+            background-color: #95999c; /* Background color */
+            border-color: #343a40; /* Border color */
+        }
+
+        .pagination .page-item.active .page-link {
+            color: #fff; /* Active text color */
+            background-color: #6c757d; /* Active background color */
+            border-color: #6c757d; /* Active border color */
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d; /* Disabled text color */
+            background-color: #f8f9fa; /* Disabled background color */
+            border-color: #dee2e6; /* Disabled border color */
+        }
+
+        .pagination .page-link:hover {
+            color: #fff; /* Hover text color */
+            background-color: #6c757d; /* Hover background color */
+            border-color: #6c757d; /* Hover border color */
+        }
+
+        /* Make Previous and Next buttons white */
+        .pagination .page-link.prev-next {
+            color: #fff; /* Text color */
+            background-color: #bec4c9; /* Background color */
+            border-color: #6c757d; /* Border color */
+        }
+
+        /* Hover effect for Previous and Next buttons */
+        .pagination .page-link.prev-next:hover {
+            background-color: #495057; /* Hover background color */
+            border-color: #495057; /* Hover border color */
+        
+        }
+
+        
+        
+
+        
+                
+</style>
+
+<body>
+
+    <h2 class="p-4 text-center" >File Name Analyzed: {{file_name}}</h2>
+
+    <div class="container-fluid p-5">            
+            
+        <div class="row">
+            <div class="col-xl-6 col-md-12 mb-4">
+            <div class="card" style="border-radius: 25px;">
+                <div class="card-body bg-dark" style="border-radius: 25px;">
+                <div class="d-flex justify-content-between p-md-1">
+                    <div class="d-flex flex-row">
+                    <div class="align-self-center popover-body">
+                        <i class="material-symbols-outlined text-info" style="font-size:42px;">query_stats</i>
+                        
+                    </div>
+                    <div class="align-self-lg-center ml-3">
+                        <h4>Total Mail Analyzed</h4>                            
+                    </div>
+                    </div>
+                    <div class="align-self-center">
+                    <h2 class="h1 mb-0">{{total_mail}}</h2>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="col-xl-6 col-md-12 mb-4">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                    <div class="d-flex justify-content-between p-md-1">
+                        <div class="d-flex flex-row">
+                        <div class="align-self-center popover-body">
+                            <i class="fas fa-users text-info fa-3x me-4"></i>
+                        </div>
+                        <div class="align-self-lg-center ml-4">
+                            <h4>Unique Senders</h4>
+                            
+                        </div>
+                        </div>
+                        <div class="align-self-center">
+                        <h2 class="h1 mb-0">{{unique_sender}}</h2>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            
+        </div>
+
+        <div class="row">
+            <div class="col-xl-6 col-md-12 mb-4 ">
+            <div class="card" style="border-radius: 25px;">
+                <div class="card-body bg-dark" style="border-radius: 25px;">
+                <div class="d-flex justify-content-between p-md-1">
+                    <div class="d-flex flex-row">
+                    <div class="align-self-center popover-body">
+                        <i class="fas fa-at text-info fa-3x me-4"></i>
+                    </div>
+                    <div class="align-self-lg-center ml-3">
+                        <h4>Top Sender</h4>                            
+                    </div>
+                    </div>
+                    <div class="align-self-center ">
+                        <h3 class=" mb-0">{{top_sender}}</h3>
+                        <h3 class=" mb-0"> N: {{count_top_sender}}</h3>                        
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="col-xl-6 col-md-12 mb-4 ">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                    <div class="d-flex justify-content-between p-md-1 mb-1">
+                        <div class="d-flex flex-row">
+                        <div class="align-self-center popover-body">
+                            <i class="far fa-list-alt text-info fa-3x me-4"></i>
+                        </div>
+                        <div class="align-self-lg-center ml-3">
+                            <h4>Unique Topics </h4>
+                            
+                        </div>
+                        </div>
+                        <div class="align-self-center ml-3">
+                            
+                                <h2 class="h1">{{unique_topics_count}}</h2>
+                            
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            
+        </div>
+
+        <div class="row">
+            
+            <div class=" col-md-12 mb-4 ">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                    <div class="d-flex justify-content-between p-md-1">
+                        <div class="d-flex flex-row">
+                        <div class="align-self-center popover-body">
+                            <i class="fas fa-tasks text-info fa-3x me-4"></i>
+                        </div>
+                        <div class="align-self-lg-center ml-3">
+                            <h4>Main Topics</h4>
+                            
+                        </div>
+                        </div>
+                        <div class="overflow-auto h6">
+                            {% for topic in main_topic %}
+                                <h5><span>{{topic[0]}}</span> <span class="ml-3">N: {{topic[1]}}</span></h5>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            
+        </div>
+        
+            
+        <h2 class="text-center">Sentiment</h2>
+        <div class="row">
+            
+            <div class="col">
+            <div class="card" style="border-radius: 25px;">
+                <div class="card-body bg-dark" style="border-radius: 25px;">
+                <div class="d-flex justify-content-between p-md-1">
+                    <div class="d-flex flex-row">
+                    <div class="align-self-center popover-body">
+                        <i class="fas far fa-smile text-info fa-3x me-4"></i>
+                    </div>
+                    <div class="align-self-lg-center ml-3">
+                        <h4>Positive</h4>                            
+                    </div>
+                    </div>
+                    <div class="align-self-center ">
+                        <h2 class="h1 mb-0">{{pos_sent_count}}</h2>
+                                             
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="col">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                    <div class="d-flex justify-content-between p-md-1">
+                        <div class="d-flex flex-row">
+                        <div class="align-self-center popover-body">
+                            <i class="fas far fa-meh text-info fa-3x me-4"></i>
+                        </div>
+                        <div class="align-self-lg-center ml-3">
+                            <h4>Neutral</h4>
+                            
+                        </div>
+                        </div>
+                        <div class="align-self-center">
+                        <h2 class="h1 mb-0">{{neu_sent_count}}</h2>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                    <div class="d-flex justify-content-between p-md-1">
+                        <div class="d-flex flex-row">
+                        <div class="align-self-center popover-body">
+                            <i class="fas far fa-frown text-info fa-3x me-4"></i>
+                        </div>
+                        <div class="align-self-lg-center ml-3">
+                            <h4>Negative</h4>
+                            
+                        </div>
+                        </div>
+                        <div class="align-self-center">
+                        <h2 class="h1 mb-0">{{neg_sent_count}}</h2>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+                
+            
+        </div>
+
+    </div>
+
+    
+        <div class="container">
+            <h1 class="mt-5">Topic Frequency</h1>
+            
+            <div class="mt-4">
+                <div id="graph"></div>             
+                
+            </div>            
+        </div>
+
+        <div class="container col-4">
+            <a href="{{ url_for('filter_page', id=file_mail.id) }}" class="text-decoration-none">
+                <div class="card" style="border-radius: 25px;">
+                    <div class="card-body bg-dark" style="border-radius: 25px;">
+                        <div class="d-flex justify-content-between p-md-1">
+                            <div class="d-flex flex-row">
+                                <div class="align-self-center popover-body">
+                                    <i class="fas fa fa-search text-info fa-3x me-4"></i>
+                                </div>
+                                <div class=" align-self-lg-center ml-5 text-decoration-none text-white">
+                                    <h3 > Emails Filters</h3>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+            
+        
+
+    <div id="accordionMailsProcessed">    
+        <div class="container">
+            <h3>Mails Processed</h3>
+            {% for mails in mail_results %}
+            <table class="table table-hover table-dark mb-md-5">
+                
+                <thead>
+                    <tr>
+                        <th scope="col" colspan="3" class="text-center">Mail Content</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">
+                            <div class="expandable-content" id="mail{{ loop.index }}">
+                            {{ mails.analyzed_mail }}
+                            </div>
+                            {% if mails.analyzed_mail | length > 30 %}
+                            <a href="javascript:void(0);" class="expand-link text-muted" id="expand-link-mail{{ loop.index }}" onclick="toggleExpandable('mail{{ loop.index }}')">Extend</a>
+                            <a href="javascript:void(0);" class="close-link text-muted" id="close-link-mail{{ loop.index }}" onclick="toggleExpandable('mail{{ loop.index }}')">Close</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+                <thead>
+                    <tr>                            
+                        <th scope="col" colspan="1" class="text-center">Sender</th>
+                        <th scope="col" colspan="2" class="text-center">Subject</th>
+                    </tr>
+                </thead>
+                </tbody>
+                    <tr>                            
+                        
+                        <td colspan="1" class="text-center">{{ mails.mail_from}}</td>
+                        <td colspan="2" class="text-center">{{ mails.subject }}</td>
+                    </tr>
+                </tbody>
+
+                <thead>
+                    <tr>                            
+                        <th scope="col" colspan="3" class="text-center">Summary</th>                        
+                    </tr>
+                </thead>
+                </tbody>
+                    <tr>                          
+                        
+                        <td colspan="3" class="text-center">{{ mails.mail_Sum}}</td>
+                        
+                    </tr>
+                </tbody>
+
+                <thead>
+                    <tr>                            
+                        <th scope="col" colspan="3" class="text-center">NER</th>                        
+                    </tr>
+                </thead>
+                </tbody>
+                    <tr>                          
+                        
+                        <td colspan="3" class="text-center">{{ mails.mail_NER }}</td>
+                        
+                    </tr>
+                </tbody>
+
+
+                
+
+                <thead> 
+                    <tr>
+                        <th scope="col" class="text-center">Top 10 Words</th>
+                        <th scope="col" class="text-center">Topic</th>
+                        <th scope="col" class="text-center">Sentiment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr>
+                        <td >{{ mails.top_10_words }}</td>
+                        <td >{{ mails.mail_topic }}</td> 
+                        <td >{{ mails.mail_Sent}}</td>
+                    </tr>
+                    
+                </tbody>
+
+
+
+                <tr class="separator">
+                    <td colspan="3"></td>
+                </tr>
+                
+
+                
+            </table>
+            {% endfor %}
+               
+                <!-- Pagination links -->
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                {% if pagination.has_prev %}
+                                <li class="page-item"><a class="page-link prev-next" href="{{ url_for('analysis_page', id=file_mail.id, page=pagination.prev_num) }}">Previous</a></li>
+                                {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                                {% endif %}
+                                {% for page_num in pagination.iter_pages() %}
+                                {% if page_num %}
+                                {% if page_num == pagination.page %}
+                                <li class="page-item active" aria-current="page"><span class="page-link">{{ page_num }}</span></li>
+                                {% else %}
+                                <li class="page-item"><a class="page-link" href="{{ url_for('analysis_page', id=file_mail.id, page=page_num) }}">{{ page_num }}</a></li>
+                                {% endif %}
+                                {% else %}
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% if pagination.has_next %}
+                                <li class="page-item"><a class="page-link prev-next" href="{{ url_for('analysis_page', id=file_mail.id, page=pagination.next_num) }}">Next</a></li>
+                                {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        
+        function toggleExpandable(id) {
+            var expandable = document.getElementById(id);
+            var expandLink = document.getElementById('expand-link-' + id);
+            var closeLink = document.getElementById('close-link-' + id);
+
+            // Verifica se l'elemento è attualmente espanso
+            var isExpanded = expandable.style.maxHeight === "none";
+
+            if (isExpanded) {
+                // Chiudi l'elemento
+                expandable.style.maxHeight = "50px";
+                closeLink.style.display = 'none';
+                expandLink.style.display = 'inline-block';
+            } else {
+                // Espandi l'elemento
+                expandable.style.maxHeight = "none";
+                closeLink.style.display = 'inline-block';
+                expandLink.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('topicSelect').addEventListener('change', function() {
+            this.form.submit();
+        });
+        document.getElementById('sentimentSelect').addEventListener('change', function() {
+            this.form.submit();
+        });
+        document.getElementById('userSelect').addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+
+    
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            var graphJSON = {{ graphJSON | safe }};
+            Plotly.react('graph', graphJSON.data, graphJSON.layout);
+            });
+        
+    
+    
+    
+    </script>
+    
+
+    
+    
+    
+    
+    
+</body>
+
+
+{% endblock %}

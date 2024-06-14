@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}
+    Email Analysis
+{% endblock %}
+{% block content %}
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-dark" style="color:white">
+        <div class="col-md-5 p-lg-5 mx-auto ">
+            <h1 class="display-3 font-weight-normal">Email Analysis</h1>
+            
+            <img src="/static/img/home.png" width="400">
+            <p class="lead font-weight-normal">Get a Dasboard Analysis</p>
+            <a class="btn btn-primary" href="{{ url_for('dashboard_page') }}">Get Started</a>
+        </div>
+        <div class="product-device box-shadow d-none d-md-block"></div>
+        <div class="product-device product-device-2 box-shadow d-none d-md-block"></div>
+    </div>
+{% endblock %}
+

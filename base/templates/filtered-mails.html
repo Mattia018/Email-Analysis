@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% block title %}
+   Filterered-EMails
+{% endblock %}
+
+{% block content %}
+
+
+<style>
+    .expandable-content {
+       max-height: 50px;
+       overflow: hidden;
+       position: relative;
+       transition: max-height 0.3s ease;
+   }
+
+   .expandable-content:target {
+       max-height: none;
+   }
+
+   .expand-link {
+       display: block;
+   }
+
+    
+   .container {
+padding-top: 20px;
+}
+.table {
+box-shadow: 0 4px 21px rgb(74 80 91 / 88%) ; /* Leggera ombreggiatura */
+border-collapse: separate;
+border-spacing: 0 10px; /* Spaziatura tra le righe */
+border-radius: 7px;
+}
+.table tbody tr {
+background-color: #454d55; /* Colore di sfondo per le righe della tabella */
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombreggiatura per le righe della tabella */
+
+}
+.table thead th {
+background-color: #343a40; /* Colore di sfondo per le intestazioni */
+}
+.table-hover tbody tr:hover {
+background-color: #555b61; /* Colore di sfondo per le righe al passaggio del mouse */
+}
+
+  
+
+.close-link {
+display: none; 
+}
+
+.expandable-content:target + .expand-link {
+display: none;
+}
+
+.expandable-content:target ~ .close-link {
+display: inline-block; 
+}
+
+/* Customize pagination colors */
+.pagination .page-link {
+color: #333; /* Text color */
+background-color: #95999c; /* Background color */
+border-color: #343a40; /* Border color */
+}
+
+.pagination .page-item.active .page-link {
+color: #fff; /* Active text color */
+background-color: #6c757d; /* Active background color */
+border-color: #6c757d; /* Active border color */
+}
+
+.pagination .page-item.disabled .page-link {
+color: #6c757d; /* Disabled text color */
+background-color: #f8f9fa; /* Disabled background color */
+border-color: #dee2e6; /* Disabled border color */
+}
+
+.pagination .page-link:hover {
+color: #fff; /* Hover text color */
+background-color: #6c757d; /* Hover background color */
+border-color: #6c757d; /* Hover border color */
+}
+
+/* Make Previous and Next buttons white */
+.pagination .page-link.prev-next {
+color: #fff; /* Text color */
+background-color: #bec4c9; /* Background color */
+border-color: #6c757d; /* Border color */
+}
+
+/* Hover effect for Previous and Next buttons */
+.pagination .page-link.prev-next:hover {
+background-color: #495057; /* Hover background color */
+border-color: #495057; /* Hover border color */
+}
+   
+</style>
+
+
+
+<body>
+    <div class="container">
+
+        <div class="container card mt-3" style="background-color: #454d55 ;">
+            <form method="get" action="{{ url_for('filtered_mails_page', id=cur_user) }}" class="mb-4">
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="topicSelect">Filter by Topic:</label>
+                        <select class="form-control" id="topicSelect" name="topic">
+                            <option value="">All Topics</option>
+                            {% for topic in unique_topics %}
+                                <option value="{{ topic }}" {% if topic == selected_topic %}selected{% endif %}>{{ topic }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="sentimentSelect">Filter by Sentiment:</label>
+                        <select class="form-control" id="sentimentSelect" name="sentiment">
+                            <option value="">All Sentiments</option>
+                            <option value="positive" {% if selected_sentiment == 'positive' %}selected{% endif %}>Positive</option>
+                            <option value="neutral" {% if selected_sentiment == 'neutral' %}selected{% endif %}>Neutral</option>
+                            <option value="negative" {% if selected_sentiment == 'negative' %}selected{% endif %}>Negative</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="senderSelect">Filter by Sender:</label>
+                        <select class="form-control" id="senderSelect" name="sender">
+                            <option value="">All Senders</option>
+                            {% for sender in unique_senders %}
+                                <option value="{{ sender }}" {% if sender == selected_sender %}selected{% endif %}>{{ sender }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3 align-self-end">
+                        <button type="submit" class="btn btn-warning btn-block">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if not mail_results %}
+            <div class="alert alert-warning mt-4" role="alert">
+                No results found for the selected filters. Please try different criteria.
+            </div>
+        {% else %}
+
+        <div >
+            <h4 class="text-center mt-4">{{ total_filtered_mails }} mail(s) found.</h4>
+        </div>    
+
+            <div id="accordionMailsProcessed">    
+                <div class="container">
+                    <h3>Mails Processed</h3>
+                    {% for mail in mail_results %}
+                    <table class="table table-hover table-dark mb-md-5">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="3" class="text-center">Mail Content</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="expandable-content" id="mail{{ loop.index }}">
+                                    {{ mail.analyzed_mail }}
+                                    </div>
+                                    {% if mail.analyzed_mail | length > 30 %}
+                                    <a href="javascript:void(0);" class="expand-link text-muted" id="expand-link-mail{{ loop.index }}" onclick="toggleExpandable('mail{{ loop.index }}')">Extend</a>
+                                    <a href="javascript:void(0);" class="close-link text-muted" id="close-link-mail{{ loop.index }}" onclick="toggleExpandable('mail{{ loop.index }}')">Close</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>                            
+                                <th scope="col" colspan="1" class="text-center">Sender</th>
+                                <th scope="col" colspan="2" class="text-center">Subject</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>                            
+                                <td colspan="1" class="text-center">{{ mail.mail_from}}</td>
+                                <td colspan="2" class="text-center">{{ mail.subject }}</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>                            
+                                <th scope="col" colspan="3" class="text-center">Summary</th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>                          
+                                <td colspan="3" class="text-center">{{ mail.mail_Sum}}</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>                            
+                                <th scope="col" colspan="3" class="text-center">NER</th>                        
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>                          
+                                <td colspan="3" class="text-center">{{ mail.mail_NER }}</td>
+                            </tr>
+                        </tbody>
+                        <thead> 
+                            <tr>
+                                <th scope="col" class="text-center">Top 10 Words</th>
+                                <th scope="col" class="text-center">Topic</th>
+                                <th scope="col" class="text-center">Sentiment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ mail.top_10_words }}</td>
+                                <td>{{ mail.mail_topic }}</td> 
+                                <td>{{ mail.mail_Sent}}</td>
+                            </tr>
+                        </tbody>
+                        <tr class="separator">
+                            <td colspan="3"></td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                    <!-- Pagination links -->
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    {% if pagination.has_prev %}
+                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filter_page', id=cur_user, page=pagination.prev_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Previous</a></li>
+                                    {% else %}
+                                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                                    {% endif %}
+                                    {% for page_num in pagination.iter_pages() %}
+                                    {% if page_num %}
+                                    {% if page_num == pagination.page %}
+                                    <li class="page-item active" aria-current="page"><span class="page-link">{{ page_num }}</span></li>
+                                    {% else %}
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('filter_page', id=cur_user, page=page_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">{{ page_num }}</a></li>
+                                    {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if pagination.has_next %}
+                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filter_page', id=cur_user, page=pagination.next_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Next</a></li>
+                                    {% else %}
+                                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+
+    <script>
+        function toggleExpandable(id) {
+            var expandable = document.getElementById(id);
+            var expandLink = document.getElementById('expand-link-' + id);
+            var closeLink = document.getElementById('close-link-' + id);
+
+            // Verifica se l'elemento è attualmente espanso
+            var isExpanded = expandable.style.maxHeight === "none";
+
+            if (isExpanded) {
+                // Chiudi l'elemento
+                expandable.style.maxHeight = "50px";
+                closeLink.style.display = 'none';
+                expandLink.style.display = 'inline-block';
+            } else {
+                // Espandi l'elemento
+                expandable.style.maxHeight = "none";
+                closeLink.style.display = 'inline-block';
+                expandLink.style.display = 'none';
+            }
+        }
+        </script>
+
+
+</body>
+
+
+
+{% endblock %}
