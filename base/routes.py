@@ -457,7 +457,7 @@ def filter_page(id):
 
     # Valori unici per suggerimenti di filtri
     unique_topics = db.session.query(MailAnalysisResult.mail_topic).filter_by(file_id=id).distinct().all()
-    unique_senders = db.session.query(MailAnalysisResult.mail_from).filter_by(file_id=id).distinct().all()
+    unique_senders = db.session.query(MailAnalysisResult.mail_from).filter_by(file_id=id).distinct().order_by(MailAnalysisResult.mail_from.asc()).all()
     unique_sentiments = db.session.query(MailAnalysisResult.mail_Sent).filter_by(file_id=id).distinct().all()
 
     return render_template('filter.html',

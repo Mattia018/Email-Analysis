@@ -29,7 +29,7 @@ class User(db.Model, UserMixin):
 class Mails(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     file_name = db.Column(db.String(length=512), nullable=False, unique=True)
-    file = db.Column(db.VARBINARY(200000))
+    file = db.Column(db.VARBINARY(25123))
     processing_status = db.Column(db.String(20), nullable=False, default='pending')
     viewable_status = db.Column(db.Boolean, nullable=False, default=False)
     owner = db.Column(db.Integer(), db.ForeignKey('user.id'))
