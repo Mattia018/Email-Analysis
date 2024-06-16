@@ -3,7 +3,7 @@ FROM python:3.9-slim
 
 # Install system dependencies
 RUN apt-get update && \
-    apt-get install -y pkg-config gcc libc-dev
+    apt-get install -y pkg-config gcc libc-dev libmysqlclient-dev
 
 # Imposta la directory di lavoro nell'immagine del contenitore
 WORKDIR /app
