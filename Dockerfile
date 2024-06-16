@@ -1,5 +1,5 @@
 # Usa l'immagine di Python ufficiale come base
-FROM ubuntu:20.04
+FROM python:3.9
 
 
 # Imposta la variabile d'ambiente non interattiva
@@ -7,10 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
 RUN apt-get update -qq && \
-    apt-get install -y -qq python3 python3-pip pkg-config gcc libc-dev libmysqlclient-dev
+    apt-get install -y -qq pkg-config gcc libc-dev default-libmysqlclient-dev
 
-# Imposta il percorso di pip nel PATH
-ENV PATH="/usr/local/bin:${PATH}"
 
 # Imposta la directory di lavoro nell'immagine del contenitore
 WORKDIR /app
