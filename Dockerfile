@@ -1,9 +1,11 @@
 # Usa l'immagine di Python ufficiale come base
-FROM python:3.9-slim
+FROM ubuntu:20.04
 
 # Install system dependencies
-RUN apt-get update && \
-    apt-get install -y pkg-config gcc libc-dev libmysqlclient-dev
+RUN apt-get update -qq && \
+    apt-get install -y -qq pkg-config gcc libc-dev libmysqlclient-dev
+
+
 
 # Imposta la directory di lavoro nell'immagine del contenitore
 WORKDIR /app
