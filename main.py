@@ -4,7 +4,7 @@ import requests
 
 def get_public_ip():
     try:
-        response = requests.get('https://ifconfig.me')
+        response = requests.get('https://api.ipify.org?format=text')
         ip = response.text.strip()
         return ip
     except Exception as e:
