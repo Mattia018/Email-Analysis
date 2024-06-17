@@ -33,3 +33,5 @@ ENV PORT=8080
 CMD ["python", "main.py"]
 
 # docker build -t gcr.io/emails-analysis/flask-webapp .
+# docker run -p 8080:8080 gcr.io/emails-analysis/flask-webapp
+
