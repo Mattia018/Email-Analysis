@@ -35,3 +35,7 @@ CMD ["python", "main.py"]
 # docker build -t gcr.io/emails-analysis/flask-webapp .
 # docker run -p 8080:8080 gcr.io/emails-analysis/flask-webapp
 
+
+# python3 -m venv venv
+# source venv/bin/activate
+# python main.py

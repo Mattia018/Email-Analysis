@@ -230,7 +230,7 @@ border-color: #495057; /* Hover border color */
                             <nav aria-label="Page navigation">
                                 <ul class="pagination">
                                     {% if pagination.has_prev %}
-                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filter_page', id=cur_user, page=pagination.prev_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Previous</a></li>
+                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filtered_mails_page', id=cur_user, page=pagination.prev_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Previous</a></li>
                                     {% else %}
                                     <li class="page-item disabled"><span class="page-link">Previous</span></li>
                                     {% endif %}
@@ -239,14 +239,14 @@ border-color: #495057; /* Hover border color */
                                     {% if page_num == pagination.page %}
                                     <li class="page-item active" aria-current="page"><span class="page-link">{{ page_num }}</span></li>
                                     {% else %}
-                                    <li class="page-item"><a class="page-link" href="{{ url_for('filter_page', id=cur_user, page=page_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">{{ page_num }}</a></li>
+                                    <li class="page-item"><a class="page-link" href="{{ url_for('filtered_mails_page', id=cur_user, page=page_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">{{ page_num }}</a></li>
                                     {% endif %}
                                     {% else %}
                                     <li class="page-item disabled"><span class="page-link">...</span></li>
                                     {% endif %}
                                     {% endfor %}
                                     {% if pagination.has_next %}
-                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filter_page', id=cur_user, page=pagination.next_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Next</a></li>
+                                    <li class="page-item"><a class="page-link prev-next" href="{{ url_for('filtered_mails_page', id=cur_user, page=pagination.next_num, topic=selected_topic, sentiment=selected_sentiment, sender=selected_sender) }}">Next</a></li>
                                     {% else %}
                                     <li class="page-item disabled"><span class="page-link">Next</span></li>
                                     {% endif %}
