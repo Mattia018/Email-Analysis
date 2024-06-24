@@ -28,6 +28,7 @@ class LoginForm(FlaskForm):
     password = PasswordField(label='Password:', validators=[DataRequired()])
     submit = SubmitField(label='Sign in')
 
+
 class UploadForm(FlaskForm):
     file_name = StringField(label='File Name:', validators=[DataRequired()])
     file = FileField(label='Mail File', validators=[FileRequired(), FileAllowed(['csv', 'txt'] )])

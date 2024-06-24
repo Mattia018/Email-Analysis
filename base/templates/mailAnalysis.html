@@ -41,42 +41,42 @@
                     display: inline-block; 
                 }
 
-                /* Customize pagination colors */
+                
                 .pagination .page-link {
-                    color: #333; /* Text color */
-                    background-color: #95999c; /* Background color */
-                    border-color: #343a40; /* Border color */
+                    color: #333; 
+                    background-color: #95999c; 
+                    border-color: #343a40; 
                 }
 
                 .pagination .page-item.active .page-link {
-                    color: #fff; /* Active text color */
-                    background-color: #6c757d; /* Active background color */
-                    border-color: #6c757d; /* Active border color */
+                    color: #fff; 
+                    background-color: #6c757d; 
+                    border-color: #6c757d; 
                 }
 
                 .pagination .page-item.disabled .page-link {
-                    color: #6c757d; /* Disabled text color */
-                    background-color: #f8f9fa; /* Disabled background color */
-                    border-color: #dee2e6; /* Disabled border color */
+                    color: #6c757d; 
+                    background-color: #f8f9fa; 
+                    border-color: #dee2e6; 
                 }
 
                 .pagination .page-link:hover {
-                    color: #fff; /* Hover text color */
-                    background-color: #6c757d; /* Hover background color */
-                    border-color: #6c757d; /* Hover border color */
+                    color: #fff; 
+                    background-color: #6c757d; 
+                    border-color: #6c757d; 
                 }
 
-                /* Make Previous and Next buttons white */
+                
                 .pagination .page-link.prev-next {
-                    color: #fff; /* Text color */
-                    background-color: #bec4c9; /* Background color */
-                    border-color: #6c757d; /* Border color */
+                    color: #fff; 
+                    background-color: #bec4c9; 
+                    border-color: #6c757d; 
                 }
 
-                /* Hover effect for Previous and Next buttons */
+                
                 .pagination .page-link.prev-next:hover {
-                    background-color: #495057; /* Hover background color */
-                    border-color: #495057; /* Hover border color */
+                    background-color: #495057; 
+                    border-color: #495057; 
                 }
                 
 </style>
@@ -389,16 +389,16 @@
             var expandLink = document.getElementById('expand-link-' + id);
             var closeLink = document.getElementById('close-link-' + id);
 
-            // Verifica se l'elemento è attualmente espanso
+            
             var isExpanded = expandable.style.maxHeight === "none";
 
             if (isExpanded) {
-                // Chiudi l'elemento
+                
                 expandable.style.maxHeight = "50px";
                 closeLink.style.display = 'none';
                 expandLink.style.display = 'inline-block';
             } else {
-                // Espandi l'elemento
+                
                 expandable.style.maxHeight = "none";
                 closeLink.style.display = 'inline-block';
                 expandLink.style.display = 'none';

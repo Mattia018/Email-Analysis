@@ -16,66 +16,39 @@ nlp = spacy.load("en_core_web_sm")
 topic_model = BERTopic.load("MaartenGr/BERTopic_Wikipedia")
 logger = MyLogger("ERROR")
 
-def clean_text(text):
-    # Rimuovi simboli non desiderati
-    cleaned_text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-    return cleaned_text
-
-def extract_topics(text, num_words=4):
-    # Pulizia del testo
-    cleaned_text = clean_text(text)
-    
-    # Tokenizzazione e preprocessamento del testo pulito
-    tokens = [token.text for token in nlp(cleaned_text) if not token.is_stop and not token.is_punct]
-    
-    # Creazione del dizionario e del corpus
-    dictionary = corpora.Dictionary([tokens])
-    corpus = [dictionary.doc2bow(tokens)]
-    
-    # Creazione del modello LDA
-    lda_model = LdaModel(corpus, num_topics=1, id2word=dictionary, passes=10)
-    
-    # Estrazione dei topic
-    topics = lda_model.print_topics(num_words=num_words)
-    
-    # Solo i termini senza i pesi
-    topic_terms = topics[0][1]
-    terms_only = ' '.join([term.split('*')[1].replace('"', '') for term in topic_terms.split(' + ')])
-    
-    return terms_only
-
-
-
+# Analisi NER
 
 def extract_ner(text):
    
-    # Applica il modello SpaCy al testo
+    # Modello SpaCy al testo
     doc = nlp(text)
     
+    # Aggiunta entità PHONE e EMAIL
     named_entities_set = set()
     for ent in doc.ents:
-        # Escludi entità con tipo errato come "PERSON" per numeri di telefono
+
         if ent.label_ not in ['PHONE', 'EMAIL']:
             named_entities_set.add(f'{ent.text} ({ent.label_})')
 
-    # Usa regex per trovare email
+    # Regex per trovare email
     email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
     emails = re.findall(email_pattern, text)
     for email in emails:
         named_entities_set.add(f'{email} (EMAIL)')
 
-    # Usa regex per trovare numeri di telefono
+    # Regex per trovare numeri di telefono
     phone_pattern = r'\b(\d{3}[-.\s]??\d{3}[-.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-.\s]??\d{4}|\d{3}[-.\s]??\d{4})\b'
     phone_numbers = re.findall(phone_pattern, text)
     for number in phone_numbers:
         named_entities_set.add(f'{number} (PHONE)')
 
-    # Converti il set in una stringa separata da virgole
+    # Preparazione risultato
     named_entities_str = ', '.join(named_entities_set)
 
     return named_entities_str
 
 
+# Topic Extraction BERTopic
 
 def topic_Bert(text):        
     
@@ -86,6 +59,7 @@ def topic_Bert(text):
 
     return topic_label
 
+# Summarizzation BART
 
 def summary_text_t5(text):
     
@@ -99,6 +73,7 @@ def summary_text_t5(text):
     return summary_text
 
 
+# Analisi Sentiment VADER
 
 def sentiment_vader(text, pos_threshold=0.55, neg_threshold=-0.05):
     analyzer = SentimentIntensityAnalyzer()
@@ -115,7 +90,7 @@ def sentiment_vader(text, pos_threshold=0.55, neg_threshold=-0.05):
     
     return main_sentiment
 
-
+# Plot frequenza Topic
 
 def plot_topic_frequencies_dash(topic_freq, top_n):
     topics = list(topic_freq.keys())[:top_n]
@@ -147,6 +122,9 @@ def plot_topic_frequencies_dash(topic_freq, top_n):
     )
 
     return fig
+
+
+# Plot Count Sentiment
 
 def plot_sentiment_counts(pos_sent, neu_sent, neg_sent):
     data = {

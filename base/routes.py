@@ -132,21 +132,21 @@ def dashboard_page():
         else:
             graphJSON=0
 
-        # Conteggio dei sentimenti positivi per tutti i file_id dell'utente corrente
+        
         positive_sentiment_count = MailAnalysisResult.query.join(Mails).filter(
             Mails.owner == current_user.id,
             MailAnalysisResult.mail_Sent == 'positive'
         ).count()
         pos_sent = positive_sentiment_count if positive_sentiment_count else 0
 
-        # Conteggio dei sentimenti neutri per tutti i file_id dell'utente corrente
+        
         neutral_sentiment_count = MailAnalysisResult.query.join(Mails).filter(
             Mails.owner == current_user.id,
             MailAnalysisResult.mail_Sent == 'neutral'
         ).count()
         neu_sent = neutral_sentiment_count if neutral_sentiment_count else 0
 
-        # Conteggio dei sentimenti negativi per tutti i file_id dell'utente corrente
+        
         negative_sentiment_count = MailAnalysisResult.query.join(Mails).filter(
             Mails.owner == current_user.id,
             MailAnalysisResult.mail_Sent == 'negative'
@@ -194,7 +194,7 @@ def register_page():
         login_user(user_to_create)
         flash(f"Account created successfully! You are now logged in as {user_to_create.username}", category='success')
         return redirect(url_for('dashboard_page'))
-    if form.errors != {}: #If there are not errors from the validations
+    if form.errors != {}: 
         for err_msg in form.errors.values():
             flash(f'There was an error with creating a user: {err_msg}', category='danger')
 
@@ -246,9 +246,9 @@ def delete_file(id):
 
 @app.route('/process/<id>', methods=['POST'])
 def process_file(id):
-    # Verifica se l'utente è autenticato
+    
     if current_user.is_authenticated:
-        # Recupera la mail associata all'ID specificato
+        
         mail = Mails.query.get(id)
         if mail:
             start_time = time.time()
@@ -256,20 +256,20 @@ def process_file(id):
             df = pd.read_csv(io.StringIO(mail.file.decode()))
             
 
-            # Carica il modello NLP per l'analisi
+            # Modello NLP per l'analisi
             nlp = spacy.load("en_core_web_sm")
 
-            # Processa il testo delle mail per ogni tupla nel DataFrame
+            
             for _, row in df.iterrows():
-                # Estrai il testo della mail
+                
                 mail_content = str(row['content'])
                 mail_subject= row['Subject']
                 mail_sender = row['X-From']
 
-                # Processa il testo delle mail
+                
                 doc = nlp(mail_content)
 
-                # Estrai le 10 parole più frequenti
+                # 10 parole più frequenti
                 word_freq = Counter(token.text for token in doc if not token.is_stop and not token.is_punct)
                 top_10_words = ' '.join([word for word, _ in word_freq.most_common(10)])
                 top_10_words = re.sub(r'[^a-zA-Z0-9\s]', '', top_10_words)
@@ -277,16 +277,16 @@ def process_file(id):
                 # Topic Extraction
                 topics = topic_Bert(mail_content)
                 
-                # Analizza le entità nominate utilizzando StanfordNLP
+                # Analisi NER
                 mail_ner = extract_ner(mail_content)
 
                 # Summarization
                 mail_summary = summary_text_t5(mail_content)
 
-                #Sentiment
+                # Analisi Sentiment
                 mail_sentiment =sentiment_vader(mail_content) 
 
-                # Salva i risultati dell'analisi delle mail nella tabella MailAnalysisResult
+                # Risultati su DB
                 analysis_result = MailAnalysisResult(
                     user_id=current_user.id,
                     file_id=mail.id,
@@ -303,17 +303,17 @@ def process_file(id):
 
             
 
-            # Aggiorna lo stato di elaborazione del file
+            
             mail.processing_status = 'processed'
 
-            # Aggiungi la logica per impostare lo stato di visualizzazione del file
+            # Logica per impostare lo stato di visualizzazione del file
             if not mail.viewable_status:
                 mail.viewable_status = True
                 flash("File Processed Successfully! Now it's viewable.", category="warning")
             else:
                 flash("File Processed Successfully!", category="warning")
             
-            # Committa le modifiche al database dopo aver elaborato tutte le mail
+            
             db.session.commit()
 
             end_time = time.time()
@@ -329,20 +329,20 @@ def process_file(id):
 
 @app.route('/view/<int:id>', methods=['GET','POST'])
 def analysis_page(id):
-    # Retrieve the specific mail entry by its id
+    
     specific_mail = Mails.query.get_or_404(id)
 
-    # Check if the current user is the owner of the mail
+    
     if specific_mail.owner != current_user.id:
         abort(403)  # Forbidden 
 
-    # Get the page number from the query parameters, default to 1 if not provided
+    # Paginator
     page = request.args.get('page', 1, type=int)
     per_page = 10  
 
     
 
-    # Queries related to the specific file ID with pagination
+    # Queries 
     mails_analysis = MailAnalysisResult.query.filter_by(file_id=id).paginate(page=page, per_page=per_page)
 
     total_emails_analyzed = mails_analysis.total
@@ -433,7 +433,7 @@ def filter_page(id):
     page = request.args.get('page', 1, type=int)
     per_page = 10
 
-    # Recupero dei valori per i filtri
+    # Valori per i filtri
     selected_topic = request.args.get('topic')
     selected_sentiment = request.args.get('sentiment')
     selected_sender = request.args.get('sender')
@@ -449,13 +449,11 @@ def filter_page(id):
     if selected_sender:
         query = query.filter_by(mail_from=selected_sender)
 
-    # Conteggio delle mail filtrate
+    # Queries
     total_filtered_mails = query.count()
-
-    # Paginazione
+    
     mails_analysis = query.paginate(page=page, per_page=per_page)
-
-    # Valori unici per suggerimenti di filtri
+    
     unique_topics = db.session.query(MailAnalysisResult.mail_topic).filter_by(file_id=id).distinct().all()
     unique_senders = db.session.query(MailAnalysisResult.mail_from).filter_by(file_id=id).distinct().order_by(MailAnalysisResult.mail_from.asc()).all()
     unique_sentiments = db.session.query(MailAnalysisResult.mail_Sent).filter_by(file_id=id).distinct().all()
@@ -477,16 +475,13 @@ def filter_page(id):
 @login_required
 def filtered_mails_page(id):
 
-    
-
-    # Verifica se l'utente è autenticato
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
 
     page = request.args.get('page', 1, type=int)
     per_page = 10
 
-    # Recupero dei valori per i filtri
+    # Valori per i filtri
     selected_topic = request.args.get('topic')
     selected_sentiment = request.args.get('sentiment')
     selected_sender = request.args.get('sender')
@@ -502,13 +497,11 @@ def filtered_mails_page(id):
     if selected_sender:
         query = query.filter_by(mail_from=selected_sender)
 
-    # Conteggio delle mail filtrate
+    # Queries
     total_filtered_mails = query.count()
 
-    # Paginazione
     mails_analysis = query.paginate(page=page, per_page=per_page)
-
-    # Valori unici per suggerimenti di filtri
+    
     unique_topics = db.session.query(MailAnalysisResult.mail_topic).filter_by( user_id=current_user.id).distinct().order_by(MailAnalysisResult.mail_topic.asc()).all()
     unique_senders = db.session.query(MailAnalysisResult.mail_from).filter_by( user_id=current_user.id).distinct().order_by(MailAnalysisResult.mail_from.asc()).all()
     unique_sentiments = db.session.query(MailAnalysisResult.mail_Sent).filter_by( user_id=current_user.id).distinct().all()

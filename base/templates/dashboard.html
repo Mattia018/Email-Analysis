@@ -102,21 +102,21 @@
         }
 
         .table {
-            box-shadow: 0 4px 21px rgb(74 80 91 / 88%) ; /* Leggera ombreggiatura */
+            box-shadow: 0 4px 21px rgb(74 80 91 / 88%) ; 
             border-collapse: separate;
-            border-spacing: 0 10px; /* Spaziatura tra le righe */
+            border-spacing: 0 10px; 
             border-radius: 7px;
         }
         .table tbody tr {
-            background-color: #454d55; /* Colore di sfondo per le righe della tabella */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombreggiatura per le righe della tabella */
+            background-color: #454d55; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
             
         }
         .table thead th {
-            background-color: #343a40; /* Colore di sfondo per le intestazioni */
+            background-color: #343a40;
         }
         .table-hover tbody tr:hover {
-            background-color: #555b61; /* Colore di sfondo per le righe al passaggio del mouse */
+            background-color: #555b61; 
         }
 
         
@@ -124,25 +124,25 @@
         .container-file {            
             
             max-height: 700px;            
-            overflow-y: auto; /* Add the ability to scroll */
+            overflow-y: auto; 
         }
 
-        /* Hide scrollbar for Chrome, Safari and Opera */
+        
         .container-file::-webkit-scrollbar {
             display: none;
         }
 
-        /* Hide scrollbar for IE, Edge and Firefox */
+        
         .container-file {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;  
+        scrollbar-width: none;  
         }
 
         .main-container {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            gap: 20px; /* Add space between elements */
+            gap: 20px; 
         }
 
         .file-list-container {
@@ -400,14 +400,14 @@
                         <thead>
                             
                             <tr>
-                                <!-- Your Columns HERE -->
+                                <!--  Columns -->
                                 <th scope="col" class="text-center">File Name</th>                                
                                 <th scope="col" class="col-7 text-center">Options</th>                                
                             </tr>
                         </thead>
                         
                             <tbody>
-                                <!-- Your rows inside the table HERE: -->
+                                <!-- rows  -->
                                 {% for mails in file_mail %}
                                     <tr>
                                         <td class="text-center">{{ mails.file_name}}</td>                                    
